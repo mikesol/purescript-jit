@@ -1,4 +1,4 @@
-exports.evalSources = function (sources) {
+exports.evalSources_ = function (sources) {
   var modules = {};
   function dirname(str) {
     var ix = str.lastIndexOf("/");

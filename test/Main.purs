@@ -41,7 +41,7 @@ add42 = add 42
                 , successCallback: Right >>> cb
                 }
               mempty
-            add42' <- liftEffect $ evalSources success.js "<file>"
+            add42' <- liftEffect $ evalSources success.js
               >>= runExceptT <<< readProp "add42"
               >>= either (throwError <<< error <<< show) pure
             let add42 = (unsafeCoerce :: Foreign -> Int -> Int) add42'

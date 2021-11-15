@@ -18,3 +18,5 @@ The API has two functions:
 
 - `compile` from `JIT.Compile`
 - `evalSources` from `JIT.EvalSources`
+
+To see how to use this from your project (ie from a webpage), check out the [test](./test/Main.purs).
