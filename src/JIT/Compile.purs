@@ -11,7 +11,7 @@ import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Exception (Error, error)
 import JIT.API as API
-import JIT.Loader (makeLoader, runLoader)
+import JIT.Loader (Loader, runLoader)
 import JIT.Types (JS(..))
 import Foreign.Object as Object
 
@@ -22,7 +22,7 @@ type CompileSuccess =
 
 compile
   :: { code :: String
-     , loaderUrl :: String
+     , loader :: Loader
      , compileUrl :: String
      , ourFaultErrorCallback :: Error -> Effect Unit
      , yourFaultErrorCallback :: Array API.CompilerError -> Effect Unit
@@ -32,7 +32,7 @@ compile
 compile
   { code
   , compileUrl
-  , loaderUrl
+  , loader
   , ourFaultErrorCallback
   , yourFaultErrorCallback
   , successCallback
@@ -46,10 +46,9 @@ compile
         API.OtherError e -> liftEffect $ ourFaultErrorCallback (error e)
         API.CompilerErrors errs -> liftEffect $ yourFaultErrorCallback errs
     Right (Right (API.CompileSuccess { js, warnings })) -> do
-      mbSources <- runExceptT $ runLoader (makeLoader loaderUrl) (JS js)
+      mbSources <- runExceptT $ runLoader loader (JS js)
       case mbSources of
         Left e -> liftEffect $ ourFaultErrorCallback (error e)
         Right sources -> do
           let eventData = Object.insert "<file>" (JS js) sources
           liftEffect $ successCallback { warnings, js: map unwrap eventData }
-
